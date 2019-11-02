@@ -80,58 +80,15 @@ RUN pip install torchvision==0.4.0 \
     scipy \
     pandas \
     matplotlib \
-    scikit-learn
+    scikit-learn \
+    opencv-contrib-python-headless
 
-# 1 st step - clone repository & install opencv 4.1.0 (using a lot of time!!)
-RUN wget -O OpenCV-4.1.0.zip https://github.com/opencv/opencv/archive/4.1.0.zip \
-    && unzip OpenCV-4.1.0.zip \
-    && rm -rf OpenCV-4.1.0.zip \
-    && wget -O OpenCV_contrib-4.1.0.zip https://github.com/opencv/opencv_contrib/archive/4.1.0.zip \
-    && unzip OpenCV_contrib-4.1.0.zip \
-    && rm -rf OpenCV_contrib-4.1.0.zip \
-    && cd opencv-4.1.0 \
-    && mkdir build \
-    && cd build \
-    ### using cmake refer from INSTALLATION.md default file ###
-    && cmake \ 
-        -DCMAKE_BUILD_TYPE=Release \
-        -DWITH_CUDA=ON \
-        -DOPENCV_EXTRA_MODULES_PATH=../../opencv_contrib-4.1.0/modules/ \
-        -DWITH_TBB=ON \
-        -DBUILD_opencv_cnn_3dobj=OFF \
-        -DBUILD_opencv_dnn=OFF \
-        -DBUILD_opencv_dnn_modern=OFF \
-        -DBUILD_opencv_dnns_easily_fooled=OFF \
-        -DOPENCV_ENABLE_NONFREE=ON \
-        .. \
-    && make -j
+
 
 # clone repository (mmaction)
 RUN git clone --recursive https://github.com/open-mmlab/mmaction.git
 
-# install cmake first
-RUN wget --no-check-certificate https://cmake.org/files/v3.9/cmake-3.9.0.tar.gz \
-    && tar -zxvf cmake-3.9.0.tar.gz \
-    && rm -rf cmake-3.9.0.tar.gz \
-    && cd cmake-3.9.0 \
-    && ./bootstrap --system-curl \
-    && make -j && make install
 
-# install decord
-RUN cd mmaction/third_party/decord \
-    && mkdir -p build \
-    && cd build \
-    && cmake .. -DUSE_CUDA=0 \
-    && make -j \
-    && cd ../python \
-    && python3 setup.py install --user
-
-# install dense flow
-RUN cd mmaction/third_party/dense_flow \
-    && mkdir build \
-    && cd build \
-    && OpenCV_DIR=/data/opencv-4.1.0/build/ cmake .. \
-    && make -j
 
 # install mmcv
 RUN git clone --recursive https://github.com/open-mmlab/mmcv.git \
